@@ -1,8 +1,8 @@
 const request = require('supertest');
 
 const app = require('../../src/app');
-const { User } = require('../../src/app/models');
 const truncate = require('../utils/truncate');
+const factory = require('../factories');
 
 describe('Autenticate', () => {
   beforeEach(async () => {
@@ -10,19 +10,45 @@ describe('Autenticate', () => {
   })
   
   it('should auth with valid credentials', async () => {
-    const user = await User.create({
-      name: 'leo',
-      email: 'leodrums11@gmail.com',
-      password_hash: '1133'
+    const user = await factory.create('User'); 
+
+    const response = await request(app)
+      .post('/sessions')
+      .send({
+        email: user.email,
+        password: '123456'
+      });
+
+    expect(response.status).toBe(200);  
+  });
+
+  it('should not auth with invalid credentials', async () => {
+    const user = await factory.create('User', {
+      password: '123'
     }); 
 
     const response = await request(app)
       .post('/sessions')
       .send({
         email: user.email,
-        password: '1133'
+        password: '123456'
       });
 
-    expect(response.status).toBe(200);  
+    expect(response.status).toBe(401);  
   });
+
+  it('should return jwt token when auth', async () => {
+    const user = await factory.create('User', {
+      password: '123456'
+    }); 
+
+    const response = await request(app)
+      .post('/sessions')
+      .send({
+        email: user.email,
+        password: '123456'
+      });
+
+    expect(response.body).toHaveProperty('token');
+  })
 });
