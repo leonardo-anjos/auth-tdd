@@ -55,6 +55,8 @@ describe('Autenticate', () => {
   })
 
   it('should be able to access privates routes when auth', async () => {
+    const user = await factory.create('User');
+
     const response = await request(app)
       .get('/dashboard')
       .set('Authorization', `Bearer ${user.generateToken()}`);
@@ -62,9 +64,16 @@ describe('Autenticate', () => {
     expect(response.status).toBe(200);
   })
 
-  it('should not be able to access privates routes when not auth', async () => {
+  it('should not be able to access privates routes without jwt token', async () => {
+    const response = await request(app).get('/dashboard');
+
+    expect(response.status).toBe(401);
+  })
+
+  it('should not be able to access privates routes with invalid jwt token', async () => {
     const response = await request(app)
-      .get('/dashboard');
+      .get('/dashboard')
+      .set('Authorization', `Bearer 123456`);
 
     expect(response.status).toBe(401);
   })
