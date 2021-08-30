@@ -7,7 +7,20 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js --ignore __tests__",
     "pretest": "NODE_ENV=test sequelize db:migrate",
-    "test": "NODE_ENV=test jest"
+    "test": "NODE_ENV=test jest --coverage",
+    "sonar":  "node sonar-project.js"
+  },
+  "jest": {
+    "testEnvironment":  "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testResultsProcessor":  "jest-sonar-reporter"
+  },
+  "jestSonar": {
+    "reportPath":  "coverage",
+    "reportFile":  "test-reporter.xml",
+    "indent":  2
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -21,8 +34,10 @@
   },
   "devDependencies": {
     "jest": "^27.1.0",
+    "jest-sonar-reporter": "^2.0.0",
     "nodemon": "^2.0.12",
     "sequelize-cli": "^6.2.0",
+    "sonarqube-scanner": "^2.8.1",
     "sqlite3": "^5.0.2",
     "supertest": "^6.1.6"
   }
